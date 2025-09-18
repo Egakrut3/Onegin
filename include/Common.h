@@ -12,6 +12,7 @@ enum User_error_code
     UNKNOWN_OPTION,
     NOT_ENOUGH_OPTION_ARGUMENTS,
     NO_INPUT_FILE,
+    NO_OUTPUT_FILE,
     __INVALID_ERROR,
 };
 
@@ -35,6 +36,7 @@ void destruct_User_error(User_error *error_ptr);
 struct Config
 {
     FILE *input_stream;
+    FILE *output_stream;
 
     bool is_valid;
 

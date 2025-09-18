@@ -72,5 +72,11 @@ errno_t destruct_Config(Config *const config_ptr)
         return 1;
     }
 
+    if (fclose(config_ptr->output_stream))
+    {
+        perror("fclose failed");
+        return 1;
+    }
+
     return 0;
 }

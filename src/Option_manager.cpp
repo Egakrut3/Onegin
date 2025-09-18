@@ -4,6 +4,7 @@
 enum Option
 {
     IN_OPTION,
+    OUT_OPTION,
     __OPTIONS_COUNT,
 };
 
@@ -30,14 +31,39 @@ static errno_t set_in_config(User_error *const error_ptr, Config *const config_p
     return construct_User_error(error_ptr, NO_ERROR, 0);
 }
 
+static errno_t set_out_config(User_error *const error_ptr, Config *const config_ptr,
+                              char const *const **const str_ptr,
+                              char const *const *const end_str)
+{
+    assert(error_ptr and !error_ptr->is_valid and
+           config_ptr and !config_ptr->is_valid and
+           str_ptr and *str_ptr and end_str and
+           *str_ptr != end_str and !strcmp(**str_ptr, "--out"));
+
+    if (++*str_ptr == end_str)
+    {
+        return construct_User_error(error_ptr, NOT_ENOUGH_OPTION_ARGUMENTS, 1, "--out");
+    }
+
+    if (fopen_s(&config_ptr->output_stream, **str_ptr, "w"))
+    {
+        perror("fopen_s failed");
+        return 1;
+    }
+
+    return construct_User_error(error_ptr, NO_ERROR, 0);
+}
+
 static char const *const flag_option_arr[__OPTIONS_COUNT] = {
        "--in",
+       "--out",
 };
 
 static errno_t (*const set_option_arr[__OPTIONS_COUNT])(User_error *const, Config *const,
                                                        char const *const **const,
                                                        char const *const *const) = {
        &set_in_config,
+       &set_out_config,
 };
 
 static errno_t select_option_setter(User_error *const error_ptr, Config *const config_ptr,
@@ -99,6 +125,11 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
     if (!used_options[IN_OPTION])
     {
         return construct_User_error(error_ptr, NO_INPUT_FILE, 0);
+    }
+
+    if (!used_options[OUT_OPTION])
+    {
+        return construct_User_error(error_ptr, NO_OUTPUT_FILE, 0);
     }
 
     config_ptr->is_valid = true;

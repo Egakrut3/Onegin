@@ -37,7 +37,7 @@
 
 int main(int const argc, char const *const *const argv)
 {
-    Config cur_config = {nullptr, false};
+    Config cur_config = {nullptr, nullptr, false};
     SET_CONFIG(cur_config, argc, argv);
 
     size_t text_len = 0;
@@ -55,7 +55,7 @@ int main(int const argc, char const *const *const argv)
 
     size_t lines1_cnt = 0;
     One_line *lines1 = nullptr;
-    if (make_sort(&lines1_cnt, &lines1, text_len, text))
+    if (make_sort(&cur_config, &lines1_cnt, &lines1, text_len, text))
     {
         free(text);
         free(lines1);
@@ -67,11 +67,12 @@ int main(int const argc, char const *const *const argv)
         return 0;
     }
 
+    fputs("\n\n$$$$$$\n\n", cur_config.output_stream);
     free(lines1);
 
     size_t lines2_cnt = 0;
     One_line *lines2 = nullptr;
-    if (make_rev_sort(&lines2_cnt, &lines2, text_len, text))
+    if (make_rev_sort(&cur_config, &lines2_cnt, &lines2, text_len, text))
     {
         free(text);
         free(lines2);
@@ -83,12 +84,10 @@ int main(int const argc, char const *const *const argv)
         return 0;
     }
 
+    fputs("\n\n$$$$$$\n\n", cur_config.output_stream);
     free(lines2);
 
-    //TODO - put somewhere
-    FILE *out_ptr = fopen("Whole_text.txt", "w");
-    fwrite(text, sizeof(char), text_len, out_ptr);
-    fclose(out_ptr);
+    fwrite(text, sizeof(char), text_len, cur_config.output_stream);
 
     free(text);
     if (destruct_Config(&cur_config))

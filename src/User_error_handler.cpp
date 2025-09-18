@@ -29,6 +29,12 @@ bool handle_User_error(User_error const *const error_ptr)
             printf("No input file is specified\n");
             return true;
 
+        case NO_OUTPUT_FILE:
+            assert(error_ptr->str_cnt == 0 and !error_ptr->data);
+
+            printf("No output file is specified\n");
+            return true;
+
         case __INVALID_ERROR:
         default:
             assert(0);
