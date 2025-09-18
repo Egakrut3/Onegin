@@ -17,13 +17,13 @@ enum User_error_code
 
 struct User_error
 {
-    size_t str_cnt;
     char **data;
+    size_t str_cnt;
     User_error_code code;
 
     bool is_valid;
 
-    User_error (User_error &) = delete;
+    //User_error (User_error &) = delete; //TODO - possible delete
     User_error &operator= (User_error &) = delete;
 };
 
@@ -38,7 +38,7 @@ struct Config
 
     bool is_valid;
 
-    Config (Config &) = delete;
+    //Config (Config &) = delete;
     Config& operator=(Config &) = delete;
 };
 

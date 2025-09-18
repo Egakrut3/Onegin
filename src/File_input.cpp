@@ -10,7 +10,7 @@ errno_t get_all_content(Config const *const config, size_t *const filesize, char
         return 1;
     }
 
-    *filesize = ftell(config->input_stream) + 1;
+    *filesize = ftell(config->input_stream);
     if (*filesize == (size_t)-1L)
     {
         perror("ftell failed");
@@ -31,7 +31,7 @@ errno_t get_all_content(Config const *const config, size_t *const filesize, char
         return 1;
     }
 
-    if (fread(*buffer, sizeof(char), *filesize - 1, config->input_stream) != *filesize - 1)
+    if (fread(*buffer, sizeof(char), *filesize, config->input_stream) != *filesize)
     {
         perror("fread failed");
         return 1;

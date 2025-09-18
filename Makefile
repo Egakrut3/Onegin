@@ -19,7 +19,7 @@ CXX_FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-
 
 TARGET = $(addprefix $(BIN_DIR), Onegin.exe)
 
-OBJ = Common Option_manager User_error_handler File_input main
+OBJ = Common Option_manager User_error_handler File_input Line Sorter main
 
 make_object = $(call make_bin_path, $(1)) : $(call make_src_path, $(1)); \
 @$(CXX) $(CXX_FLAGS) -c $$< -I $(H_DIR) -o $$@
@@ -41,7 +41,12 @@ $(call make_object, User_error_handler)
 
 $(call make_object, File_input)
 
+$(call make_object, Line)
+
+$(call make_object, Sorter)
+
 $(call make_object, main)
+
 
 clean:
 	@rm -rf bin
