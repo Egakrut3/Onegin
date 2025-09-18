@@ -86,6 +86,10 @@ int main(int const argc, char const *const *const argv)
     free(lines2);
 
     //TODO - put somewhere
+    FILE *out_ptr = fopen("Whole_text.txt", "w");
+    fwrite(text, sizeof(char), text_len, out_ptr);
+    fclose(out_ptr);
+
     free(text);
     if (destruct_Config(&cur_config))
     {
