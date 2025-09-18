@@ -88,7 +88,6 @@ int main(int const argc, char const *const *const argv)
     free(lines2);
 
     fwrite(text, sizeof(char), text_len, cur_config.output_stream);
-
     free(text);
     if (destruct_Config(&cur_config))
     {
