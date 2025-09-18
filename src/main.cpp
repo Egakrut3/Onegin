@@ -37,8 +37,17 @@
 
 int main(int const argc, char const *const *const argv)
 {
-    Config cur_config = {nullptr, nullptr, false};
+    Config cur_config = {nullptr, nullptr, false, false};
     SET_CONFIG(cur_config, argc, argv);
+    if (cur_config.is_help)
+    {
+        if (destruct_Config(&cur_config))
+        {
+            return 0;
+        }
+
+        return 0;
+    }
 
     size_t text_len = 0;
     char *text = nullptr;
@@ -94,6 +103,6 @@ int main(int const argc, char const *const *const argv)
         return 0;
     }
 
-    printf("\n\n\nCOMMIT GITHUB\n\n");
+    colored_printf(RED, BLACK, "\n\n\nCOMMIT GITHUB\n\n");
     return 0;
 }

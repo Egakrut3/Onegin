@@ -8,6 +8,9 @@ make_src_path = $(addprefix $(SRC_DIR), $(addsuffix $(SRC_SUF), $(1)))
 
 H_DIR = ./include/
 
+LIB_DIR = static_libs/
+LIBS = Colored_printf
+
 CXX = g++
 CXX_FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline   \
 -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default  \
@@ -27,7 +30,7 @@ make_object = $(call make_bin_path, $(1)) : $(call make_src_path, $(1)); \
 .PHONY : all prepare clean
 
 all : prepare $(call make_bin_path, $(OBJ))
-	@$(CXX) $(CXX_FLAGS) $(call make_bin_path, $(OBJ)) -o $(TARGET)
+	@$(CXX) $(CXX_FLAGS) $(call make_bin_path, $(OBJ)) -L$(LIB_DIR) $(addprefix -l, $(LIBS)) -o $(TARGET)
 	@echo Compilation end
 
 prepare :

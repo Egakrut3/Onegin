@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include "Colored_printf.h"
 #include <errno.h>
 #include <assert.h>
 #define __STDC_WANT_LIB_EXT1__ 1
@@ -37,6 +38,7 @@ struct Config
 {
     FILE *input_stream;
     FILE *output_stream;
+    bool is_help;
 
     bool is_valid;
 

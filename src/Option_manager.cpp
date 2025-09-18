@@ -3,10 +3,30 @@
 
 enum Option
 {
+    HELP_OPTION,
     IN_OPTION,
     OUT_OPTION,
     __OPTIONS_COUNT,
 };
+
+static errno_t set_help_config(User_error *const error_ptr, Config *const config_ptr,
+                                char const *const **const str_ptr,
+                                char const *const *const end_str)
+{
+    assert(error_ptr and !error_ptr->is_valid and
+           config_ptr and !config_ptr->is_valid and
+           str_ptr and *str_ptr and end_str and
+           *str_ptr != end_str and !strcmp(**str_ptr, "--help"));
+
+    config_ptr->is_help = true;
+    printf("Usage: Onegin.exe [options] file...\nOptions:\n"
+           "\t%-10s %s\n""\t%-10s %s\n""\t%-10s %s\n",
+           "--help", "Display the information about options",
+           "--in", "Tells path to input-file by folowed parameter. If none is specified, stdin be used",
+           "--out", "Tells path to output-file by folowed parameter. If none is specified, stdout be used"
+           );
+    return construct_User_error(error_ptr, NO_ERROR, 0);
+}
 
 static errno_t set_in_config(User_error *const error_ptr, Config *const config_ptr,
                              char const *const **const str_ptr,
@@ -55,6 +75,7 @@ static errno_t set_out_config(User_error *const error_ptr, Config *const config_
 }
 
 static char const *const flag_option_arr[__OPTIONS_COUNT] = {
+       "--help",
        "--in",
        "--out",
 };
@@ -62,6 +83,7 @@ static char const *const flag_option_arr[__OPTIONS_COUNT] = {
 static errno_t (*const set_option_arr[__OPTIONS_COUNT])(User_error *const, Config *const,
                                                        char const *const **const,
                                                        char const *const *const) = {
+       &set_help_config,
        &set_in_config,
        &set_out_config,
 };
