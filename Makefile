@@ -49,4 +49,4 @@ $(call make_object, main)
 
 
 clean:
-	@rm -rf bin
+	@rm -rf bin Result.txt
