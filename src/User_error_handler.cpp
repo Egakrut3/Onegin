@@ -23,18 +23,6 @@ bool handle_User_error(User_error const *const error_ptr)
             printf("\"%s\" option requires more arguments after itself\n", error_ptr->data[0]);
             return true;
 
-        case NO_INPUT_FILE:
-            assert(error_ptr->str_cnt == 0); assert(!error_ptr->data);
-
-            printf("No input file is specified\n");
-            return true;
-
-        case NO_OUTPUT_FILE:
-            assert(error_ptr->str_cnt == 0); assert(!error_ptr->data);
-
-            printf("No output file is specified\n");
-            return true;
-
         case __INVALID_ERROR:
         default:
             assert(0);

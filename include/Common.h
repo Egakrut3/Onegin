@@ -14,9 +14,7 @@ enum User_error_code
     NO_ERROR,                    ///< Code 0
     UNKNOWN_OPTION,              ///< Code 1
     NOT_ENOUGH_OPTION_ARGUMENTS, ///< Code 2
-    NO_INPUT_FILE,               ///< Code 3
-    NO_OUTPUT_FILE,              ///< Code 4
-    __INVALID_ERROR,             ///< Code 5
+    __INVALID_ERROR,             ///< Code 3
 };
 
 struct User_error

@@ -137,12 +137,22 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
 
     if (!used_options[IN_OPTION])
     {
-        return construct_User_error(error_ptr, NO_INPUT_FILE, 0); //TODO -
+        if (fopen_s(&config_ptr->input_stream, "Onegin.txt", "r"))
+        {
+            __PRINT_LINE__();
+            perror("fopen_s failed");
+            return 1;
+        }
     }
 
     if (!used_options[OUT_OPTION])
     {
-        return construct_User_error(error_ptr, NO_OUTPUT_FILE, 0); //TODO -
+        if (fopen_s(&config_ptr->output_stream, "Result.txt", "w"))
+        {
+            __PRINT_LINE__();
+            perror("fopen_s failed");
+            return 1;
+        }
     }
 
     config_ptr->is_valid = true;
