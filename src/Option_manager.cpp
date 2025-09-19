@@ -13,10 +13,10 @@ static errno_t set_help_config(User_error *const error_ptr, Config *const config
                                 char const *const **const str_ptr,
                                 char const *const *const end_str)
 {
-    assert(error_ptr and !error_ptr->is_valid and
-           config_ptr and !config_ptr->is_valid and
-           str_ptr and *str_ptr and end_str and
-           *str_ptr != end_str and !strcmp(**str_ptr, "--help"));
+    assert(error_ptr); assert(!error_ptr->is_valid);
+    assert(config_ptr); assert(!config_ptr->is_valid);
+    assert(str_ptr); assert(*str_ptr); assert(end_str);
+    assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--help"));
 
     config_ptr->is_help = true;
     printf("Usage: Onegin.exe [options] file...\nOptions:\n"
@@ -32,10 +32,10 @@ static errno_t set_in_config(User_error *const error_ptr, Config *const config_p
                              char const *const **const str_ptr,
                              char const *const *const end_str)
 {
-    assert(error_ptr and !error_ptr->is_valid and
-           config_ptr and !config_ptr->is_valid and
-           str_ptr and *str_ptr and end_str and
-           *str_ptr != end_str and !strcmp(**str_ptr, "--in"));
+    assert(error_ptr); assert(!error_ptr->is_valid);
+    assert(config_ptr); assert(!config_ptr->is_valid);
+    assert(str_ptr); assert(*str_ptr); assert(end_str);
+    assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--in"));
 
     if (++*str_ptr == end_str)
     {
@@ -44,6 +44,7 @@ static errno_t set_in_config(User_error *const error_ptr, Config *const config_p
 
     if (fopen_s(&config_ptr->input_stream, **str_ptr, "r"))
     {
+        __PRINT_LINE__();
         perror("fopen_s failed");
         return 1;
     }
@@ -55,10 +56,10 @@ static errno_t set_out_config(User_error *const error_ptr, Config *const config_
                               char const *const **const str_ptr,
                               char const *const *const end_str)
 {
-    assert(error_ptr and !error_ptr->is_valid and
-           config_ptr and !config_ptr->is_valid and
-           str_ptr and *str_ptr and end_str and
-           *str_ptr != end_str and !strcmp(**str_ptr, "--out"));
+    assert(error_ptr); assert(!error_ptr->is_valid);
+    assert(config_ptr); assert(!config_ptr->is_valid);
+    assert(str_ptr); assert(*str_ptr); assert(end_str);
+    assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--out"));
 
     if (++*str_ptr == end_str)
     {
@@ -67,6 +68,7 @@ static errno_t set_out_config(User_error *const error_ptr, Config *const config_
 
     if (fopen_s(&config_ptr->output_stream, **str_ptr, "w"))
     {
+        __PRINT_LINE__();
         perror("fopen_s failed");
         return 1;
     }
@@ -93,18 +95,15 @@ static errno_t select_option_setter(User_error *const error_ptr, Config *const c
                                     char const *const *const end_str,
                                     bool *const used_options)
 {
-    assert(error_ptr and !error_ptr->is_valid and
-           config_ptr and !config_ptr->is_valid and
-           str_ptr and *str_ptr and end_str and
-           *str_ptr != end_str and
-           used_options);
+    assert(error_ptr); assert(!error_ptr->is_valid);
+    assert(config_ptr); assert(!config_ptr->is_valid);
+    assert(str_ptr); assert(*str_ptr); assert(end_str);
+    assert(*str_ptr != end_str);
+    assert(used_options);
 
     for (size_t i = 0; i < __OPTIONS_COUNT; ++i)
     {
-        if (strcmp(**str_ptr, flag_option_arr[i]))
-        {
-            continue;
-        }
+        if (strcmp(**str_ptr, flag_option_arr[i])) { continue; }
 
         used_options[i] = true;
         return set_option_arr[i](error_ptr, config_ptr, str_ptr, end_str);
@@ -116,9 +115,9 @@ static errno_t select_option_setter(User_error *const error_ptr, Config *const c
 errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
                    size_t const argc, char const *const *const argv)
 {
-    assert(error_ptr and !error_ptr->is_valid and
-           config_ptr and !config_ptr->is_valid and
-           argc > 0 and argv);
+    assert(error_ptr); assert(!error_ptr->is_valid);
+    assert(config_ptr); assert(!config_ptr->is_valid);
+    assert(argc > 0); assert(argv);
 
     char const *const *const end_str = argv + argc;
 
@@ -127,31 +126,23 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
     bool used_options[__OPTIONS_COUNT] = {};
     for (char const *const *str = argv + 1; str != end_str; ++str)
     {
-        assert(str and *str);
+        assert(str); assert(*str);
 
-        errno_t ret_err = select_option_setter(error_ptr, config_ptr, &str, end_str, used_options);
-        if (ret_err)
-        {
-            return ret_err;
-        }
+        if (select_option_setter(error_ptr, config_ptr, &str, end_str, used_options)) { return 1; }
 
-        if (error_ptr->code != NO_ERROR)
-        {
-            error_ptr->is_valid = true;
-            return 0;
-        }
+        if (error_ptr->code != NO_ERROR) { return 0; }
 
         error_ptr->is_valid = false;
     }
 
     if (!used_options[IN_OPTION])
     {
-        return construct_User_error(error_ptr, NO_INPUT_FILE, 0);
+        return construct_User_error(error_ptr, NO_INPUT_FILE, 0); //TODO -
     }
 
     if (!used_options[OUT_OPTION])
     {
-        return construct_User_error(error_ptr, NO_OUTPUT_FILE, 0);
+        return construct_User_error(error_ptr, NO_OUTPUT_FILE, 0); //TODO -
     }
 
     config_ptr->is_valid = true;

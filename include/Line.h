@@ -5,8 +5,8 @@
 
 struct One_line
 {
-    char const *beg;
-    char const *end;
+    char const *beg,
+               *end;
 };
 
 errno_t split_text(size_t *const lines_cnt, One_line **const lines,

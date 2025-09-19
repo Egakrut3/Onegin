@@ -6,7 +6,7 @@
 errno_t construct_User_error(User_error *const error_ptr, User_error_code const code,
                              size_t const str_cnt, ...)
 {
-    assert(error_ptr and !error_ptr->is_valid);
+    assert(error_ptr); assert(!error_ptr->is_valid);
 
     error_ptr->code = code;
     error_ptr->str_cnt = str_cnt;
@@ -20,6 +20,7 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
     error_ptr->data = (char **)calloc(str_cnt, sizeof(char *));
     if (!error_ptr->data)
     {
+        __PRINT_LINE__();
         perror("calloc failed");
         return 1;
     }
@@ -35,6 +36,7 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
         error_ptr->data[i] = strdup(new_str);
         if (!error_ptr->data[i])
         {
+            __PRINT_LINE__();
             perror("strdup failed");
             return 1;
         }
@@ -47,12 +49,12 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
 
 void destruct_User_error(User_error *const error_ptr)
 {
-    assert(error_ptr and error_ptr->is_valid);
+    assert(error_ptr); assert(error_ptr->is_valid);
 
     error_ptr->is_valid = false;
     for (size_t i = 0; i < error_ptr->str_cnt; ++i)
     {
-        assert(error_ptr->data and error_ptr->data[i]);
+        assert(error_ptr->data); assert(error_ptr->data[i]);
 
         free(error_ptr->data[i]);
     }
@@ -68,12 +70,14 @@ errno_t destruct_Config(Config *const config_ptr)
     config_ptr->is_valid = false;
     if (fclose(config_ptr->input_stream))
     {
+        __PRINT_LINE__();
         perror("fclose failed");
         return 1;
     }
 
     if (fclose(config_ptr->output_stream))
     {
+        __PRINT_LINE__();
         perror("fclose failed");
         return 1;
     }

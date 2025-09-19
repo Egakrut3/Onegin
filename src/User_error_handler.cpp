@@ -2,35 +2,35 @@
 
 bool handle_User_error(User_error const *const error_ptr)
 {
-    assert(error_ptr and error_ptr->is_valid);
+    assert(error_ptr); assert(error_ptr->is_valid);
 
     switch (error_ptr->code)
     {
         case NO_ERROR:
-            assert(error_ptr->str_cnt == 0 and !error_ptr->data);
+            assert(error_ptr->str_cnt == 0); assert(!error_ptr->data);
 
             return false;
 
         case UNKNOWN_OPTION:
-            assert(error_ptr->str_cnt == 1 and error_ptr->data and error_ptr->data[0]);
+            assert(error_ptr->str_cnt == 1); assert(error_ptr->data); assert(error_ptr->data[0]);
 
             printf("\"%s\" option is unknown\n", error_ptr->data[0]);
             return true;
 
         case NOT_ENOUGH_OPTION_ARGUMENTS:
-            assert(error_ptr->str_cnt == 1 and error_ptr->data and error_ptr->data[0]);
+            assert(error_ptr->str_cnt == 1); assert(error_ptr->data); assert(error_ptr->data[0]);
 
             printf("\"%s\" option requires more arguments after itself\n", error_ptr->data[0]);
             return true;
 
         case NO_INPUT_FILE:
-            assert(error_ptr->str_cnt == 0 and !error_ptr->data);
+            assert(error_ptr->str_cnt == 0); assert(!error_ptr->data);
 
             printf("No input file is specified\n");
             return true;
 
         case NO_OUTPUT_FILE:
-            assert(error_ptr->str_cnt == 0 and !error_ptr->data);
+            assert(error_ptr->str_cnt == 0); assert(!error_ptr->data);
 
             printf("No output file is specified\n");
             return true;
