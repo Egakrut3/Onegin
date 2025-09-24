@@ -141,7 +141,7 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
         {
             __PRINT_LINE__();
             perror("fopen_s failed");
-            return 1;
+            return 1; //TODO - return real errno
         }
     }
 

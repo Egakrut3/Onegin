@@ -30,7 +30,7 @@
 } while (false)
 
 static errno_t make_sort(Config const *const config_ptr, size_t *const lines_cnt, One_line **const lines,
-                  size_t const text_len, char const *const text)
+                         size_t const text_len, char const *const text)
 {
     assert(lines_cnt); assert(lines); assert(text);
 

@@ -19,14 +19,11 @@ enum User_error_code
 
 struct User_error
 {
-    char **data;
-    size_t str_cnt;
+    char            **data; //TODO - check codestyle
+    size_t          str_cnt;
     User_error_code code;
 
     bool is_valid;
-
-    //User_error (User_error &) = delete;
-    User_error &operator= (User_error &) = delete;
 };
 
 errno_t construct_User_error(User_error *error_ptr, User_error_code code,
@@ -41,9 +38,6 @@ struct Config
     bool is_help;
 
     bool is_valid;
-
-    //Config (Config &) = delete;
-    Config& operator=(Config &) = delete;
 };
 
 errno_t destruct_Config(Config *config_ptr);

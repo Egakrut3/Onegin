@@ -25,7 +25,8 @@ bool handle_User_error(User_error const *const error_ptr)
 
         case __INVALID_ERROR:
         default:
-            assert(0);
+            __PRINT_LINE__();
+            abort();
 
             return true;
     }

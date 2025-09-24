@@ -55,8 +55,8 @@ static int my_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr
         if (!isalpha(c1)) { ++pos1; continue; }
         if (!isalpha(c2)) { ++pos2; continue; }
 
-        if (c1 < c2) { return -1; }
-        else if (c2 < c1) { return 1; }
+        if      (c1 < c2) { return -1; }
+        else if (c2 < c1) { return  1; }
         else { ++pos1; ++pos2; }
     }
 
@@ -88,8 +88,8 @@ int my_rev_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr)
         if (!isalpha(c1)) { --pos1; continue; }
         if (!isalpha(c2)) { --pos2; continue; }
 
-        if (c1 < c2) { return -1; }
-        else if (c1 > c2) { return 1; }
+        if      (c1 < c2) { return -1; }
+        else if (c1 > c2) { return  1; }
         else { --pos1; --pos2; }
     }
 
@@ -125,6 +125,4 @@ void my_sort(size_t const arr_len, One_line *const arr,
             swap_One_line(new_elem - 1, new_elem);
         }
     }
-
-    return;
 }

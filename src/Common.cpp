@@ -8,11 +8,11 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
 {
     assert(error_ptr); assert(!error_ptr->is_valid);
 
-    error_ptr->code = code;
+    error_ptr->code    = code;
     error_ptr->str_cnt = str_cnt;
     if (!str_cnt)
     {
-        error_ptr->data = nullptr;
+        error_ptr->data     = nullptr;
         error_ptr->is_valid = true;
         return 0;
     }
