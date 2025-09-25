@@ -4,97 +4,100 @@
 
 errno_t get_path_filesize(char const *const path, __int64 *const filesize)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(path); assert(filesize);
 
-    struct _stat64 buffer = {}; //TODO - uninitialized variable
-    if (_stat64(path, &buffer))
-    {
-        __PRINT_LINE__();
-        perror("_stat64 failed");
-        return 1;
-    }
-
+    struct _stat64 buffer = {};
+    CHECK_FUNC(_stat64, path, &buffer);
     *filesize = buffer.st_size;
 
     assert(*filesize > 0);
 
+    CLEAR_RESOURCES();
     return 0;
 }
 
-errno_t get_opened_filesize(FILE *const cur_file, __int64 *const filesize)
+errno_t get_opened_filesize(struct FILE *const cur_file, __int64 *const filesize)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(cur_file); assert(filesize);
 
     struct _stat64 buffer = {};
-    if (_fstat64(fileno(cur_file), &buffer))
-    {
-        __PRINT_LINE__();
-        perror("_fstat64 failed");
-        return 1;
-    }
-
+    CHECK_FUNC(_fstat64, fileno(cur_file), &buffer);
     *filesize = buffer.st_size;
 
     assert(*filesize > 0);
 
+    CLEAR_RESOURCES();
     return 0;
 }
 
 errno_t get_all_content(Config const *const config, size_t *const filesize, char **const buffer)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(config); assert(filesize); assert(buffer);
 
     __int64 const start_pos = _ftelli64(config->input_stream);
     if (start_pos == -1L)
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("_ftelli64 failed");
-        return 1;
+        CLEAR_RESOURCES();
+        return errno;
     }
 
     get_opened_filesize(config->input_stream, (__int64 *)filesize);
     if (*filesize == 0)
     {
-        __PRINT_LINE__();
+        errno = EEMPTY_INP;
+
+        PRINT_LINE();
         fprintf(stderr, "Input file is empty\n");
-        return 1;
+        CLEAR_RESOURCES();
+        return errno;
     }
 
     rewind(config->input_stream);
     *buffer = (char *)calloc(*filesize, sizeof(char));
     if (!*buffer)
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("calloc failed");
-        if (_fseeki64(config->input_stream, start_pos, SEEK_SET))
+        if (_fseeki64(config->input_stream, start_pos, SEEK_SET)) //TODO - make clear
         {
-            __PRINT_LINE__();
+            PRINT_LINE();
             perror("_fseeki64 failed");
-            return 1;
+            return errno;
         }
 
-        return 1;
+        return errno;
     }
 
     if (fread(*buffer, sizeof(char), *filesize, config->input_stream) != *filesize)
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("fread failed");
         if (_fseeki64(config->input_stream, start_pos, SEEK_SET))
         {
-            __PRINT_LINE__();
+            PRINT_LINE();
             perror("_fseeki64 failed");
-            return 1;
+            return errno;
         }
 
-        return 1;
+        return errno;
     }
 
     if (_fseeki64(config->input_stream, start_pos, SEEK_SET))
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("_fseeki64 failed");
-        return 1;
+        return errno;
     }
 
     return 0;

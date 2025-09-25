@@ -10,8 +10,8 @@ enum Option
 };
 
 static errno_t set_help_config(User_error *const error_ptr, Config *const config_ptr,
-                                char const *const **const str_ptr,
-                                char const *const *const end_str)
+                               char const *const **const str_ptr,
+                               char const *const *const end_str)
 {
     assert(error_ptr); assert(!error_ptr->is_valid);
     assert(config_ptr); assert(!config_ptr->is_valid);
@@ -44,9 +44,9 @@ static errno_t set_in_config(User_error *const error_ptr, Config *const config_p
 
     if (fopen_s(&config_ptr->input_stream, **str_ptr, "r"))
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("fopen_s failed");
-        return 1;
+        return errno;
     }
 
     return construct_User_error(error_ptr, NO_ERROR, 0);
@@ -68,9 +68,9 @@ static errno_t set_out_config(User_error *const error_ptr, Config *const config_
 
     if (fopen_s(&config_ptr->output_stream, **str_ptr, "w"))
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("fopen_s failed");
-        return 1;
+        return errno;
     }
 
     return construct_User_error(error_ptr, NO_ERROR, 0);
@@ -128,7 +128,8 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
     {
         assert(str); assert(*str);
 
-        if (select_option_setter(error_ptr, config_ptr, &str, end_str, used_options)) { return 1; }
+        errno_t ret_err = select_option_setter(error_ptr, config_ptr, &str, end_str, used_options);
+        if (ret_err) { return ret_err; }
 
         if (error_ptr->code != NO_ERROR) { return 0; }
 
@@ -139,9 +140,9 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
     {
         if (fopen_s(&config_ptr->input_stream, "Onegin.txt", "r"))
         {
-            __PRINT_LINE__();
+            PRINT_LINE();
             perror("fopen_s failed");
-            return 1; //TODO - return real errno
+            return errno;
         }
     }
 
@@ -149,9 +150,9 @@ errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
     {
         if (fopen_s(&config_ptr->output_stream, "Result.txt", "w"))
         {
-            __PRINT_LINE__();
+            PRINT_LINE();
             perror("fopen_s failed");
-            return 1;
+            return errno;
         }
     }
 

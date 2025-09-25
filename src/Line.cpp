@@ -20,9 +20,9 @@ errno_t split_text(size_t *const lines_cnt, One_line **const lines,
     *lines = (One_line *)calloc(*lines_cnt, sizeof(One_line));
     if (!*lines)
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("calloc failed");
-        return 1;
+        return errno;
     }
 
     *lines_cnt = 0;
@@ -48,7 +48,8 @@ static int my_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr
 
     char const *pos1 = str1_ptr->beg,
                *pos2 = str2_ptr->beg;
-    while (pos1 != str1_ptr->end and pos2 != str2_ptr->end)
+    while (pos1 != str1_ptr->end and
+           pos2 != str2_ptr->end)
     {
         char c1 = (char)tolower((int)*pos1),
              c2 = (char)tolower((int)*pos2);
@@ -56,11 +57,11 @@ static int my_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr
         if (!isalpha(c2)) { ++pos2; continue; }
 
         if      (c1 < c2) { return -1; }
-        else if (c2 < c1) { return  1; }
+        else if (c2 < c1) { return 1; }
         else { ++pos1; ++pos2; }
     }
 
-    if (pos2 != str2_ptr->end) { return -1; } //TODO - is it good codestyle?
+    if (pos2 != str2_ptr->end) { return -1; }
     else
     {
         if (pos1 != str1_ptr->end) { return 1; }
@@ -81,7 +82,8 @@ int my_rev_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr)
 
     char const *pos1 = str1_ptr->end - 1,
                *pos2 = str2_ptr->end - 1;
-    while (pos1 != str1_ptr->beg - 1 and pos2 != str2_ptr->beg - 1)
+    while (pos1 != str1_ptr->beg - 1 and
+           pos2 != str2_ptr->beg - 1)
     {
         char c1 = (char)tolower((int)*pos1),
              c2 = (char)tolower((int)*pos2);
@@ -89,11 +91,11 @@ int my_rev_cmp(One_line const *const str1_ptr, One_line const *const str2_ptr)
         if (!isalpha(c2)) { --pos2; continue; }
 
         if      (c1 < c2) { return -1; }
-        else if (c1 > c2) { return  1; }
+        else if (c1 > c2) { return 1; }
         else { --pos1; --pos2; }
     }
 
-    if (pos2 != str2_ptr->beg - 1) { return -1; } //TODO - the same
+    if (pos2 != str2_ptr->beg - 1) { return -1; }
     else
     {
         if (pos1 != str1_ptr->beg - 1) { return 1; }

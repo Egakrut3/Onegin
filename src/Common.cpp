@@ -3,9 +3,12 @@
 #include <stdarg.h>
 #include <string.h>
 
-errno_t construct_User_error(User_error *const error_ptr, User_error_code const code,
-                             size_t const str_cnt, ...)
+errno_t construct_User_error(struct User_error *const error_ptr, struct User_error_code const code,
+                                                                 size_t const str_cnt, ...)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(error_ptr); assert(!error_ptr->is_valid);
 
     error_ptr->code    = code;
@@ -20,9 +23,10 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
     error_ptr->data = (char **)calloc(str_cnt, sizeof(char *));
     if (!error_ptr->data)
     {
-        __PRINT_LINE__();
+        PRINT_LINE();
         perror("calloc failed");
-        return 1;
+        CLEAR_RESOURCES();
+        return errno;
     }
 
     va_list arg_list = nullptr;
@@ -36,19 +40,24 @@ errno_t construct_User_error(User_error *const error_ptr, User_error_code const 
         error_ptr->data[i] = strdup(new_str);
         if (!error_ptr->data[i])
         {
-            __PRINT_LINE__();
+            PRINT_LINE();
             perror("strdup failed");
-            return 1;
+            CLEAR_RESOURCES();
+            return errno;
         }
     }
 
     va_end(arg_list);
     error_ptr->is_valid = true;
+    CLEAR_RESOURCES();
     return 0;
 }
 
-void destruct_User_error(User_error *const error_ptr)
+void destruct_User_error(struct User_error *const error_ptr)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(error_ptr); assert(error_ptr->is_valid);
 
     error_ptr->is_valid = false;
@@ -60,27 +69,18 @@ void destruct_User_error(User_error *const error_ptr)
     }
 
     free(error_ptr->data);
-    return;
+    CLEAR_RESOURCES();
 }
 
-errno_t destruct_Config(Config *const config_ptr)
+void destruct_Config(struct Config *const config_ptr)
 {
+#undef FINISH_CODE
+#define FINISH_CODE
+
     assert(config_ptr);
 
     config_ptr->is_valid = false;
-    if (fclose(config_ptr->input_stream))
-    {
-        __PRINT_LINE__();
-        perror("fclose failed");
-        return 1;
-    }
-
-    if (fclose(config_ptr->output_stream))
-    {
-        __PRINT_LINE__();
-        perror("fclose failed");
-        return 1;
-    }
-
-    return 0;
+    fclose(config_ptr->input_stream);
+    fclose(config_ptr->output_stream);
+    CLEAR_RESOURCES();
 }

@@ -18,6 +18,6 @@ enum Color
     WHITE,   ///<White color
 };
 
-int colored_printf(Color foreground_color, Color background_color, char const *format, ...);
+int colored_printf(enum Color foreground_color, enum Color background_color, char const *format, ...);
 
 #endif
