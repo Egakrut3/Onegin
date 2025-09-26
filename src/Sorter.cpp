@@ -1,11 +1,15 @@
 #include "Sorter.h"
 
-errno_t make_sort(Config const *const config_ptr, size_t *const lines_cnt, One_line **const lines,
-                                                  size_t const text_len, char const *const text)
+errno_t make_sort(struct Config const *const config_ptr,
+                  size_t *const lines_cnt, struct One_line **const lines,
+                  size_t const text_len, char const *const text)
 {
     assert(lines_cnt); assert(lines); assert(text);
 
-    if (split_text(lines_cnt, lines, text_len, text)) { return 1; }
+#undef FINAL_CODE
+#define FINAL_CODE
+
+    CHECK_FUNC(split_text, lines_cnt, lines, text_len, text);
 
 #ifdef _DEBUG
 
@@ -17,7 +21,7 @@ errno_t make_sort(Config const *const config_ptr, size_t *const lines_cnt, One_l
 
 #endif
 
-    qsort(*lines, *lines_cnt, sizeof(One_line), &my_q_cmp);
+    qsort(*lines, *lines_cnt, sizeof(struct One_line), &my_q_cmp);
     for (size_t i = 0; i < *lines_cnt; ++i)
     {
         fwrite((*lines)[i].beg, sizeof(char), (*lines)[i].end - (*lines)[i].beg,
@@ -35,15 +39,20 @@ errno_t make_sort(Config const *const config_ptr, size_t *const lines_cnt, One_l
 
 #endif
 
+    CLEAR_RESOURCES();
     return 0;
 }
 
-errno_t make_rev_sort(Config const *const config_ptr, size_t *const lines_cnt, One_line **const lines,
+errno_t make_rev_sort(struct Config const *const config_ptr,
+                      size_t *const lines_cnt, struct One_line **const lines,
                       size_t const text_len, char const *const text)
 {
     assert(lines_cnt); assert(lines); assert(text);
 
-    if (split_text(lines_cnt, lines, text_len, text)) { return 1; }
+#undef FINAL_CODE
+#define FINAL_CODE
+
+    CHECK_FUNC(split_text, lines_cnt, lines, text_len, text);
 
 #ifdef _DEBUG
 
@@ -73,5 +82,6 @@ errno_t make_rev_sort(Config const *const config_ptr, size_t *const lines_cnt, O
 
 #endif
 
+    CLEAR_RESOURCES();
     return 0;
 }

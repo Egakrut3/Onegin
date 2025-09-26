@@ -9,7 +9,7 @@ enum Option
     __OPTIONS_COUNT,
 };
 
-static errno_t set_help_config(User_error *const error_ptr, Config *const config_ptr,
+static errno_t set_help_config(struct User_error *const error_ptr, struct Config *const config_ptr,
                                char const *const **const str_ptr,
                                char const *const *const end_str)
 {
@@ -18,6 +18,9 @@ static errno_t set_help_config(User_error *const error_ptr, Config *const config
     assert(str_ptr); assert(*str_ptr); assert(end_str);
     assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--help"));
 
+#undef FINAL_CODE
+#define FINAL_CODE
+
     config_ptr->is_help = true;
     printf("Usage: Onegin.exe [options] file...\nOptions:\n"
            "\t%-10s %s\n""\t%-10s %s\n""\t%-10s %s\n",
@@ -25,10 +28,11 @@ static errno_t set_help_config(User_error *const error_ptr, Config *const config
            "--in", "Tells path to input-file by folowed parameter. If none is specified, stdin be used",
            "--out", "Tells path to output-file by folowed parameter. If none is specified, stdout be used"
            );
+    CLEAR_RESOURCES();
     return construct_User_error(error_ptr, NO_ERROR, 0);
 }
 
-static errno_t set_in_config(User_error *const error_ptr, Config *const config_ptr,
+static errno_t set_in_config(struct User_error *const error_ptr, struct Config *const config_ptr,
                              char const *const **const str_ptr,
                              char const *const *const end_str)
 {
@@ -37,22 +41,21 @@ static errno_t set_in_config(User_error *const error_ptr, Config *const config_p
     assert(str_ptr); assert(*str_ptr); assert(end_str);
     assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--in"));
 
+#undef FINAL_CODE
+#define FINAL_CODE
+
     if (++*str_ptr == end_str)
     {
+        CLEAR_RESOURCES();
         return construct_User_error(error_ptr, NOT_ENOUGH_OPTION_ARGUMENTS, 1, "--in");
     }
 
-    if (fopen_s(&config_ptr->input_stream, **str_ptr, "r"))
-    {
-        PRINT_LINE();
-        perror("fopen_s failed");
-        return errno;
-    }
-
+    CHECK_FUNC(fopen_s, &config_ptr->input_stream, **str_ptr, "r");
+    CLEAR_RESOURCES();
     return construct_User_error(error_ptr, NO_ERROR, 0);
 }
 
-static errno_t set_out_config(User_error *const error_ptr, Config *const config_ptr,
+static errno_t set_out_config(struct User_error *const error_ptr, struct Config *const config_ptr,
                               char const *const **const str_ptr,
                               char const *const *const end_str)
 {
@@ -61,18 +64,17 @@ static errno_t set_out_config(User_error *const error_ptr, Config *const config_
     assert(str_ptr); assert(*str_ptr); assert(end_str);
     assert(*str_ptr != end_str); assert(!strcmp(**str_ptr, "--out"));
 
+#undef FINAL_CODE
+#define FINAL_CODE
+
     if (++*str_ptr == end_str)
     {
+        CLEAR_RESOURCES();
         return construct_User_error(error_ptr, NOT_ENOUGH_OPTION_ARGUMENTS, 1, "--out");
     }
 
-    if (fopen_s(&config_ptr->output_stream, **str_ptr, "w"))
-    {
-        PRINT_LINE();
-        perror("fopen_s failed");
-        return errno;
-    }
-
+    CHECK_FUNC(fopen_s, &config_ptr->output_stream, **str_ptr, "w");
+    CLEAR_RESOURCES();
     return construct_User_error(error_ptr, NO_ERROR, 0);
 }
 
@@ -82,7 +84,7 @@ static char const *const flag_option_arr[__OPTIONS_COUNT] = {
        "--out",
 };
 
-static errno_t (*const set_option_arr[__OPTIONS_COUNT])(User_error *const, Config *const,
+static errno_t (*const set_option_arr[__OPTIONS_COUNT])(struct User_error *const, struct Config *const,
                                                        char const *const **const,
                                                        char const *const *const) = {
        &set_help_config,
@@ -90,7 +92,7 @@ static errno_t (*const set_option_arr[__OPTIONS_COUNT])(User_error *const, Confi
        &set_out_config,
 };
 
-static errno_t select_option_setter(User_error *const error_ptr, Config *const config_ptr,
+static errno_t select_option_setter(struct User_error *const error_ptr, struct Config *const config_ptr,
                                     char const *const **const str_ptr,
                                     char const *const *const end_str,
                                     bool *const used_options)
@@ -101,61 +103,59 @@ static errno_t select_option_setter(User_error *const error_ptr, Config *const c
     assert(*str_ptr != end_str);
     assert(used_options);
 
+#undef FINAL_CODE
+#define FINAL_CODE
+
     for (size_t i = 0; i < __OPTIONS_COUNT; ++i)
     {
         if (strcmp(**str_ptr, flag_option_arr[i])) { continue; }
 
         used_options[i] = true;
+        CLEAR_RESOURCES();
         return set_option_arr[i](error_ptr, config_ptr, str_ptr, end_str);
     }
 
+    CLEAR_RESOURCES();
     return construct_User_error(error_ptr, UNKNOWN_OPTION, 1, **str_ptr);
 }
 
-errno_t set_config(User_error *const error_ptr, Config *const config_ptr,
+errno_t set_config(struct User_error *const error_ptr, struct Config *const config_ptr,
                    size_t const argc, char const *const *const argv)
 {
     assert(error_ptr); assert(!error_ptr->is_valid);
     assert(config_ptr); assert(!config_ptr->is_valid);
-    assert(argc > 0); assert(argv);
+    assert(argc > 0); assert(argv); assert(*argv);
 
     char const *const *const end_str = argv + argc;
+    bool used_options[__OPTIONS_COUNT] = {};
+
+#undef FINAL_CODE
+#define FINAL_CODE
 
     assert(end_str);
 
-    bool used_options[__OPTIONS_COUNT] = {};
     for (char const *const *str = argv + 1; str != end_str; ++str)
     {
         assert(str); assert(*str);
 
-        errno_t ret_err = select_option_setter(error_ptr, config_ptr, &str, end_str, used_options);
-        if (ret_err) { return ret_err; }
+        CHECK_FUNC(select_option_setter, error_ptr, config_ptr, &str, end_str, used_options);
 
-        if (error_ptr->code != NO_ERROR) { return 0; }
+        if (error_ptr->code != NO_ERROR) { CLEAR_RESOURCES(); return 0; }
 
         error_ptr->is_valid = false;
     }
 
     if (!used_options[IN_OPTION])
     {
-        if (fopen_s(&config_ptr->input_stream, "Onegin.txt", "r"))
-        {
-            PRINT_LINE();
-            perror("fopen_s failed");
-            return errno;
-        }
+        CHECK_FUNC(fopen_s, &config_ptr->input_stream, "Onegin.txt", "r");
     }
 
     if (!used_options[OUT_OPTION])
     {
-        if (fopen_s(&config_ptr->output_stream, "Result.txt", "w"))
-        {
-            PRINT_LINE();
-            perror("fopen_s failed");
-            return errno;
-        }
+        CHECK_FUNC(fopen_s, &config_ptr->output_stream, "Result.txt", "w");
     }
 
     config_ptr->is_valid = true;
+    CLEAR_RESOURCES();
     return construct_User_error(error_ptr, NO_ERROR, 0);
 }

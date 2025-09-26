@@ -3,6 +3,6 @@
 
 #include "Common.h"
 
-bool handle_User_error(User_error const *error_ptr);
+bool handle_User_error(struct User_error const *error_ptr);
 
 #endif

@@ -3,13 +3,17 @@
 #include <stdarg.h>
 #include <string.h>
 
-errno_t construct_User_error(struct User_error *const error_ptr, struct User_error_code const code,
+errno_t construct_User_error(struct User_error *const error_ptr, enum User_error_code const code,
                                                                  size_t const str_cnt, ...)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(error_ptr); assert(!error_ptr->is_valid);
+
+    va_list arg_list = nullptr;
+    va_start(arg_list, str_cnt);
+
+#undef FINAL_CODE
+#define FINAL_CODE      \
+    va_end(arg_list);
 
     error_ptr->code    = code;
     error_ptr->str_cnt = str_cnt;
@@ -17,6 +21,7 @@ errno_t construct_User_error(struct User_error *const error_ptr, struct User_err
     {
         error_ptr->data     = nullptr;
         error_ptr->is_valid = true;
+        CLEAR_RESOURCES();
         return 0;
     }
 
@@ -29,8 +34,6 @@ errno_t construct_User_error(struct User_error *const error_ptr, struct User_err
         return errno;
     }
 
-    va_list arg_list = nullptr;
-    va_start(arg_list, str_cnt);
     for (size_t i = 0; i < str_cnt; ++i)
     {
         char const *const new_str = va_arg(arg_list, char const *);
@@ -47,7 +50,6 @@ errno_t construct_User_error(struct User_error *const error_ptr, struct User_err
         }
     }
 
-    va_end(arg_list);
     error_ptr->is_valid = true;
     CLEAR_RESOURCES();
     return 0;
@@ -55,10 +57,10 @@ errno_t construct_User_error(struct User_error *const error_ptr, struct User_err
 
 void destruct_User_error(struct User_error *const error_ptr)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(error_ptr); assert(error_ptr->is_valid);
+
+#undef FINAL_CODE
+#define FINAL_CODE
 
     error_ptr->is_valid = false;
     for (size_t i = 0; i < error_ptr->str_cnt; ++i)
@@ -74,10 +76,10 @@ void destruct_User_error(struct User_error *const error_ptr)
 
 void destruct_Config(struct Config *const config_ptr)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(config_ptr);
+
+#undef FINAL_CODE
+#define FINAL_CODE
 
     config_ptr->is_valid = false;
     fclose(config_ptr->input_stream);

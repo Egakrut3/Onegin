@@ -4,12 +4,13 @@
 
 errno_t get_path_filesize(char const *const path, __int64 *const filesize)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(path); assert(filesize);
 
     struct _stat64 buffer = {};
+
+#undef FINAL_CODE
+#define FINAL_CODE
+
     CHECK_FUNC(_stat64, path, &buffer);
     *filesize = buffer.st_size;
 
@@ -19,14 +20,15 @@ errno_t get_path_filesize(char const *const path, __int64 *const filesize)
     return 0;
 }
 
-errno_t get_opened_filesize(struct FILE *const cur_file, __int64 *const filesize)
+errno_t get_opened_filesize(FILE *const cur_file, __int64 *const filesize)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(cur_file); assert(filesize);
 
     struct _stat64 buffer = {};
+
+#undef FINAL_CODE
+#define FINAL_CODE
+
     CHECK_FUNC(_fstat64, fileno(cur_file), &buffer);
     *filesize = buffer.st_size;
 
@@ -36,12 +38,12 @@ errno_t get_opened_filesize(struct FILE *const cur_file, __int64 *const filesize
     return 0;
 }
 
-errno_t get_all_content(Config const *const config, size_t *const filesize, char **const buffer)
+errno_t get_all_content(struct Config const *const config, size_t *const filesize, char **const buffer)
 {
-#undef FINISH_CODE
-#define FINISH_CODE
-
     assert(config); assert(filesize); assert(buffer);
+
+#undef FINAL_CODE
+#define FINAL_CODE
 
     __int64 const start_pos = _ftelli64(config->input_stream);
     if (start_pos == -1L)
@@ -50,6 +52,15 @@ errno_t get_all_content(Config const *const config, size_t *const filesize, char
         perror("_ftelli64 failed");
         CLEAR_RESOURCES();
         return errno;
+    }
+
+#undef FINAL_CODE
+#define FINAL_CODE                                              \
+    if (_fseeki64(config->input_stream, start_pos, SEEK_SET))   \
+    {                                                           \
+        PRINT_LINE();                                           \
+        perror("_fseeki64 failed");                             \
+        return errno;                                           \
     }
 
     get_opened_filesize(config->input_stream, (__int64 *)filesize);
@@ -69,13 +80,7 @@ errno_t get_all_content(Config const *const config, size_t *const filesize, char
     {
         PRINT_LINE();
         perror("calloc failed");
-        if (_fseeki64(config->input_stream, start_pos, SEEK_SET)) //TODO - make clear
-        {
-            PRINT_LINE();
-            perror("_fseeki64 failed");
-            return errno;
-        }
-
+        CLEAR_RESOURCES();
         return errno;
     }
 
@@ -83,22 +88,10 @@ errno_t get_all_content(Config const *const config, size_t *const filesize, char
     {
         PRINT_LINE();
         perror("fread failed");
-        if (_fseeki64(config->input_stream, start_pos, SEEK_SET))
-        {
-            PRINT_LINE();
-            perror("_fseeki64 failed");
-            return errno;
-        }
-
+        CLEAR_RESOURCES();
         return errno;
     }
 
-    if (_fseeki64(config->input_stream, start_pos, SEEK_SET))
-    {
-        PRINT_LINE();
-        perror("_fseeki64 failed");
-        return errno;
-    }
-
+    CLEAR_RESOURCES();
     return 0;
 }

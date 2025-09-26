@@ -15,19 +15,31 @@
 #define CLEAR_RESOURCES()   \
 do                          \
 {                           \
-    FINISH_CODE             \
+    FINAL_CODE              \
 } while (false)
 
-#define CHECK_FUNC(func, ...)      \
-do                                 \
-{                                  \
-    if (func(__VA_ARGS__))         \
-    {                              \
-        PRINT_LINE();              \
-        perror(#func " failed");   \
-        CLEAR_RESOURCES();         \
-        return errno;              \
-    }                              \
+#define CHECK_FUNC(func, ...)       \
+do                                  \
+{                                   \
+    if (func(__VA_ARGS__))          \
+    {                               \
+        PRINT_LINE();               \
+        perror(#func " failed");    \
+        CLEAR_RESOURCES();          \
+        return errno;               \
+    }                               \
+} while (false)
+
+#define MAIN_CHECK_FUNC(func, ...)  \ //TODO - is it necessary?
+do                                  \
+{                                   \
+    if (func(__VA_ARGS__))          \
+    {                               \
+        PRINT_LINE();               \
+        perror(#func " failed");    \
+        CLEAR_RESOURCES();          \
+        return 0;                   \
+    }                               \
 } while (false)
 
 enum User_error_code
@@ -42,23 +54,23 @@ struct User_error
 {
     char                   **data;
     size_t                 str_cnt;
-    struct User_error_code code;
+    enum User_error_code code;
 
     bool                   is_valid;
 };
 
-errno_t construct_User_error(struct User_error *error_ptr, struct User_error_code code,
+errno_t construct_User_error(struct User_error *error_ptr, enum User_error_code code,
                                                            size_t str_cnt, ...);
 
 void destruct_User_error(struct User_error *error_ptr);
 
 struct Config
 {
-    struct FILE *input_stream,
-                *output_stream;
-    bool        is_help;
+    FILE *input_stream,
+         *output_stream;
+    bool is_help;
 
-    bool        is_valid;
+    bool is_valid;
 };
 
 void destruct_Config(struct Config *config_ptr);
