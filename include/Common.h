@@ -30,7 +30,8 @@ do                                  \
     }                               \
 } while (false)
 
-#define MAIN_CHECK_FUNC(func, ...)  \ //TODO - is it necessary?
+ //TODO - is it necessary?
+#define MAIN_CHECK_FUNC(func, ...)  \
 do                                  \
 {                                   \
     if (func(__VA_ARGS__))          \
