@@ -30,7 +30,7 @@ do                                  \
     }                               \
 } while (false)
 
- //TODO - is it necessary?
+//TODO - is it necessary?
 #define MAIN_CHECK_FUNC(func, ...)  \
 do                                  \
 {                                   \
