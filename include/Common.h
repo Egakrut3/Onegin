@@ -55,7 +55,7 @@ struct User_error
 {
     char                   **data;
     size_t                 str_cnt;
-    enum User_error_code code;
+    enum User_error_code   code;
 
     bool                   is_valid;
 };
